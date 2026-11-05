@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prism Mockups (Light)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    min-height: 100vh; padding: 48px; color: #1b1b1f;
+    font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 12% 22%, #7aa7ff 0, transparent 32%),
+      radial-gradient(circle at 82% 18%, #ffb3d1 0, transparent 32%),
+      radial-gradient(circle at 62% 82%, #8fe0c8 0, transparent 36%),
+      radial-gradient(circle at 22% 88%, #ffd59a 0, transparent 32%),
+      linear-gradient(135deg, #dfe8ff, #f6e9ff);
+  }
+  h1 { font-weight: 600; font-size: 22px; }
+  .sub { opacity: .65; margin: 4px 0 40px; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 56px 48px; }
+  .label { font-size: 13px; font-weight: 600; opacity: .7; margin-bottom: 16px; }
+  .note { font-size: 12px; opacity: .6; margin-top: 14px; line-height: 1.5; }
+  .stage { position: relative; display: flex; gap: 20px; align-items: flex-start; }
+  .blob { position: absolute; border-radius: 50%; filter: saturate(140%); z-index: 0; }
+
+  /* Glass material: Acrylic blur (DWM) + tint + edge highlight + specular sheen */
+  .glass {
+    position: relative; z-index: 1; border-radius: 24px;
+    background: linear-gradient(135deg, rgba(255,255,255,.58), rgba(255,255,255,.26));
+    backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.75);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(255,255,255,.25),
+                0 12px 32px rgba(40,50,90,.18), 0 2px 6px rgba(40,50,90,.08);
+  }
+  .glass::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: radial-gradient(120% 60% at 20% 0%, rgba(255,255,255,.6), transparent 55%);
+  }
+  .time { font-size: 56px; font-weight: 600; letter-spacing: -1.5px; line-height: 1; }
+  .ampm { font-size: 18px; font-weight: 500; opacity: .55; margin-left: 6px; letter-spacing: 0; }
+  .date { font-size: 15px; opacity: .7; margin-top: 8px; }
+  .muted { opacity: .55; font-size: 13px; }
+
+  /* A: Classic */
+  .card-a { width: 300px; padding: 22px 24px; }
+  .divider { height: 1px; background: rgba(0,0,0,.08); margin: 18px 0 14px; }
+  .batt-row { display: flex; align-items: center; gap: 10px; }
+  .batt { width: 34px; height: 16px; border: 1.6px solid rgba(0,0,0,.55); border-radius: 5px; padding: 2px; position: relative; }
+  .batt::after { content: ""; position: absolute; right: -5px; top: 4px; width: 3px; height: 6px; border-radius: 0 2px 2px 0; background: rgba(0,0,0,.55); }
+  .batt-fill { height: 100%; border-radius: 2px; background: #2fb35a; }
+  .pct { font-weight: 600; font-size: 16px; }
+  .tools { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; z-index: 2; }
+  .tool { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-size: 13px;
+          background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.8); }
+
+  /* Context menu */
+  .menu { width: 210px; padding: 6px; border-radius: 14px; font-size: 13px; }
+  .item { display: flex; justify-content: space-between; padding: 8px 12px; border-radius: 8px; }
+  .item:hover, .item.hl { background: rgba(0,0,0,.05); }
+  .sep { height: 1px; background: rgba(0,0,0,.08); margin: 4px 8px; }
+
+  /* B: Ring */
+  .card-b { width: 340px; padding: 22px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .ring { --p: 78; width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center;
+          background: conic-gradient(#2fb35a calc(var(--p) * 1%), rgba(0,0,0,.08) 0); }
+  .ring-in { width: 68px; height: 68px; border-radius: 50%; background: rgba(255,255,255,.75);
+             display: grid; place-items: center; text-align: center; line-height: 1.1; }
+
+  /* C: Compact pill */
+  .card-c { padding: 12px 20px; border-radius: 999px; display: flex; align-items: center; gap: 14px; font-size: 15px; }
+  .card-c .t { font-weight: 600; font-size: 20px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(0,0,0,.25); }
+</style>
+</head>
+<body>
+  <h1>Prism – Light Theme Mockups</h1>
+  <div class="sub">Combined card: Time · Date · Battery. Values below are live from your PC.</div>
+
+  <div class="grid">
+    <section>
+      <div class="label">A · Classic card (with hover tools + right-click menu)</div>
+      <div class="stage">
+        <div class="blob" style="width:140px;height:140px;background:#5b8cff;left:200px;top:-20px"></div>
+        <div class="blob" style="width:90px;height:90px;background:#ff7eb0;left:-20px;top:110px"></div>
+        <div class="glass card-a">
+          <div class="tools"><div class="tool" title="Always on top">📌</div><div class="tool" title="Settings">⚙</div></div>
+          <div class="time"><span class="js-time">10:42</span><span class="ampm js-ampm">AM</span></div>
+          <div class="date js-date">Thursday, November 5</div>
+          <div class="divider"></div>
+          <div class="batt-row">
+            <div class="batt"><div class="batt-fill js-fill" style="width:78%"></div></div>
+            <span class="pct js-pct">78%</span>
+            <span class="muted js-state">⚡ Charging</span>
+          </div>
+        </div>
+        <div class="glass menu">
+          <div class="item hl"><span>Always on top</span><span>✓</span></div>
+          <div class="item"><span>Lock position</span><span></span></div>
+          <div class="item"><span>Click-through</span><span></span></div>
+          <div class="sep"></div>
+          <div class="item"><span>Settings…</span><span></span></div>
+          <div class="item"><span>Hide widget</span><span></span></div>
+        </div>
+      </div>
+      <div class="note">Tools fade in on hover. 📌 toggles Always-on-top ↔ Desktop level.</div>
+    </section>
+
+    <section>
+      <div class="label">B · Battery ring</div>
+      <div class="stage">
+        <div class="blob" style="width:120px;height:120px;background:#3fd1a3;left:240px;top:-24px"></div>
+        <div class="blob" style="width:80px;height:80px;background:#ffb347;left:30px;top:70px"></div>
+        <div class="glass card-b">
+          <div>
+            <div class="time" style="font-size:48px"><span class="js-time">10:42</span><span class="ampm js-ampm">AM</span></div>
+            <div class="date js-date">Thursday, November 5</div>
+          </div>
+          <div class="ring js-ring"><div class="ring-in"><div><div class="pct js-pct">78%</div><div class="muted js-state" style="font-size:11px">⚡</div></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="label">C · Compact pill</div>
+      <div class="stage">
+        <div class="blob" style="width:70px;height:70px;background:#a77bff;left:150px;top:-14px"></div>
+        <div class="glass card-c">
+          <span class="t js-time">10:42</span><span class="dot"></span>
+          <span class="js-date-short">Thu, Nov 5</span><span class="dot"></span>
+          <div class="batt" style="width:28px;height:14px"><div class="batt-fill js-fill" style="width:78%"></div></div>
+          <span class="pct js-pct" style="font-size:15px">78%</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+  const $$ = s => document.querySelectorAll(s);
+  function tick() {
+    const d = new Date(), h = d.getHours();
+    const t = `${(h % 12) || 12}:${String(d.getMinutes()).padStart(2, "0")}`;
+    $$(".js-time").forEach(e => e.textContent = t);
+    $$(".js-ampm").forEach(e => e.textContent = h < 12 ? "AM" : "PM");
+    $$(".js-date").forEach(e => e.textContent = d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }));
+    $$(".js-date-short").forEach(e => e.textContent = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }));
+  }
+  function battery(level, charging) {
+    const p = Math.round(level * 100), c = p <= 10 ? "#e5484d" : p <= 20 ? "#f5a524" : "#2fb35a";
+    $$(".js-pct").forEach(e => e.textContent = p + "%");
+    $$(".js-fill").forEach(e => { e.style.width = p + "%"; e.style.background = c; });
+    $$(".js-ring").forEach(e => { e.style.setProperty("--p", p);
+      e.style.background = `conic-gradient(${c} ${p}%, rgba(0,0,0,.08) 0)`; });
+    $$(".js-state").forEach(e => e.textContent = charging ? "⚡ Charging" : "On battery");
+  }
+  tick(); setInterval(tick, 1000);
+  if (navigator.getBattery) navigator.getBattery().then(b => {
+    const u = () => battery(b.level, b.charging);
+    u(); b.onlevelchange = b.onchargingchange = u;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prism – Spectrum Layouts</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    min-height: 100vh; padding: 40px 48px; color: #1b1b1f;
+    font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 12% 22%, #7aa7ff 0, transparent 32%),
+      radial-gradient(circle at 82% 18%, #ffb3d1 0, transparent 32%),
+      radial-gradient(circle at 62% 82%, #8fe0c8 0, transparent 36%),
+      radial-gradient(circle at 22% 88%, #ffd59a 0, transparent 32%),
+      linear-gradient(135deg, #dfe8ff, #f6e9ff);
+  }
+  h1 { font-weight: 600; font-size: 22px; }
+  .sub { opacity: .65; margin: 4px 0 18px; font-size: 14px; }
+  .controls { display: flex; gap: 10px; margin-bottom: 36px; flex-wrap: wrap; }
+  .controls button {
+    font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 10px; cursor: pointer;
+    border: 1px solid rgba(255,255,255,.8); background: rgba(255,255,255,.55); backdrop-filter: blur(12px);
+  }
+  .controls button.on { background: #2f6fe4; color: #fff; border-color: #2f6fe4; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 48px 40px; }
+  .label { font-size: 13px; font-weight: 600; opacity: .75; margin-bottom: 6px; }
+  .note { font-size: 12px; opacity: .6; margin-bottom: 14px; line-height: 1.45; max-width: 320px; }
+  .stage { position: relative; }
+  .blob { position: absolute; border-radius: 50%; z-index: 0; }
+
+  /* Glass card (same material as the app) */
+  .glass {
+    position: relative; z-index: 1; width: 300px; border-radius: 16px; overflow: hidden;
+    background: linear-gradient(135deg, rgba(255,255,255,.58), rgba(255,255,255,.26));
+    backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.8);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 12px 32px rgba(40,50,90,.18);
+    transition: padding-bottom .5s ease;
+  }
+  .glass::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(120% 60% at 20% 0%, rgba(255,255,255,.55), transparent 55%);
+  }
+  .body { position: relative; padding: 20px 24px 18px; }
+  .time-row { display: flex; align-items: flex-end; justify-content: space-between; }
+  .time { font-size: 56px; font-weight: 600; letter-spacing: -1.5px; line-height: 1; }
+  .ampm { font-size: 18px; font-weight: 500; opacity: .55; margin-left: 6px; letter-spacing: 0; }
+  .date { font-size: 15px; opacity: .7; margin-top: 6px; }
+  .tz { font-size: 12px; opacity: .5; margin-top: 2px; }
+  .divider { height: 1px; background: rgba(0,0,0,.08); margin: 16px 0 12px; }
+
+  /* Battery */
+  .batt-row { display: flex; align-items: center; gap: 10px; }
+  .batt { width: 34px; height: 16px; border: 1.6px solid rgba(0,0,0,.55); border-radius: 5px; padding: 2px; position: relative; flex: none; }
+  .batt::after { content: ""; position: absolute; right: -5px; top: 4px; width: 3px; height: 6px; border-radius: 0 2px 2px 0; background: rgba(0,0,0,.55); }
+  .batt-fill { height: 100%; border-radius: 2px; background: #2fb35a; }
+  .pct { font-weight: 600; font-size: 16px; }
+  .muted { opacity: .55; font-size: 13px; }
+  .batt-side { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; padding-bottom: 6px; }
+  .batt-side .pct { font-size: 14px; }
+  .batt-mini { position: absolute; top: 16px; right: 18px; display: flex; align-items: center; gap: 5px;
+               font-size: 12px; font-weight: 600; transition: opacity .4s; }
+  .batt-mini .batt { width: 24px; height: 12px; border-radius: 4px; padding: 1.5px; }
+  .batt-mini .batt::after { right: -4px; top: 3px; width: 2px; height: 4px; }
+
+  /* Spectrum */
+  .spectrum { display: flex; align-items: flex-end; gap: 3px; height: 26px; transition: opacity .6s ease; }
+  .spectrum span {
+    flex: 1; min-height: 2px; border-radius: 3px 3px 1px 1px;
+    background: linear-gradient(to top, rgba(76,120,255,.85), rgba(165,110,255,.7));
+  }
+  .edge { position: relative; height: 30px; padding: 0 10px; margin-top: -4px; transition: height .5s ease, opacity .6s; }
+  .edge .spectrum { height: 100%; gap: 2px; }
+  .edge .spectrum span { opacity: .7; border-radius: 3px 3px 0 0; }
+  .silent .fade { opacity: 0; }
+  .silent .edge.fade { height: 0; }
+</style>
+</head>
+<body>
+  <h1>Prism – Spectrum Layouts</h1>
+  <div class="sub">The bars move to simulated audio. Use the buttons to see each layout when it's silent or when the battery is low.</div>
+  <div class="controls">
+    <button id="btnSilence">Simulate silence</button>
+    <button id="btnLow">Simulate low battery (15%)</button>
+    <button id="btnCharge">Simulate charging</button>
+  </div>
+  <div class="grid">
+    <section>
+      <div class="label">A · Spectrum replaces the battery row</div>
+      <div class="note">Same height as today. Divider kept; a flat faint line when silent.</div>
+      <div class="stage">
+        <div class="blob" style="width:130px;height:130px;background:#5b8cff;left:210px;top:-20px"></div>
+        <div class="glass"><div class="body">
+          <div class="time-row"><div class="time"><span class="js-time"></span><span class="ampm js-ampm"></span></div></div>
+          <div class="date js-date"></div><div class="tz js-tz"></div>
+          <div class="divider"></div>
+          <div class="spectrum js-spectrum" data-bars="28"></div>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="label">B · Clean, spectrum on the bottom edge</div>
+      <div class="note">No divider and no battery. Bars rise from the card's edge and fade away when silent.</div>
+      <div class="stage">
+        <div class="blob" style="width:110px;height:110px;background:#3fd1a3;left:230px;top:-24px"></div>
+        <div class="glass"><div class="body">
+          <div class="time-row"><div class="time"><span class="js-time"></span><span class="ampm js-ampm"></span></div></div>
+          <div class="date js-date"></div><div class="tz js-tz"></div>
+        </div>
+        <div class="edge fade"><div class="spectrum js-spectrum" data-bars="40"></div></div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="label">C · Like B, small battery only when it matters</div>
+      <div class="note">The battery icon appears top-right only when charging or at 20% or below.</div>
+      <div class="stage">
+        <div class="blob" style="width:90px;height:90px;background:#ff7eb0;left:-20px;top:90px"></div>
+        <div class="glass"><div class="body">
+          <div class="batt-mini js-mini"><div class="batt"><div class="batt-fill js-fill"></div></div><span class="js-pct"></span><span class="js-bolt"></span></div>
+          <div class="time-row"><div class="time"><span class="js-time"></span><span class="ampm js-ampm"></span></div></div>
+          <div class="date js-date"></div><div class="tz js-tz"></div>
+        </div>
+        <div class="edge fade"><div class="spectrum js-spectrum" data-bars="40"></div></div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="label">D · Battery beside the time</div>
+      <div class="note">The battery always shows, to the right of the time. Spectrum on the bottom edge, fades when silent.</div>
+      <div class="stage">
+        <div class="blob" style="width:110px;height:110px;background:#ffb347;left:200px;top:60px"></div>
+        <div class="glass"><div class="body">
+          <div class="time-row">
+            <div class="time"><span class="js-time"></span><span class="ampm js-ampm"></span></div>
+            <div class="batt-side">
+              <div class="batt-row" style="gap:6px"><div class="batt"><div class="batt-fill js-fill"></div></div></div>
+              <div><span class="pct js-pct"></span> <span class="muted js-bolt"></span></div>
+            </div>
+          </div>
+          <div class="date js-date"></div><div class="tz js-tz"></div>
+        </div>
+        <div class="edge fade"><div class="spectrum js-spectrum" data-bars="40"></div></div></div>
+      </div>
+    </section>
+  </div>
+
+<script>
+  const $$ = s => document.querySelectorAll(s);
+  const state = { silent: false, low: false, charging: false, level: 0.78, realCharging: false };
+
+  // Clock + time zone
+  function tick() {
+    const d = new Date(), h = d.getHours();
+    $$(".js-time").forEach(e => e.textContent = `${(h % 12) || 12}:${String(d.getMinutes()).padStart(2, "0")}`);
+    $$(".js-ampm").forEach(e => e.textContent = h < 12 ? "AM" : "PM");
+    $$(".js-date").forEach(e => e.textContent = d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }));
+    const zone = Intl.DateTimeFormat("en-US", { timeZoneName: "long" }).formatToParts(d).find(p => p.type === "timeZoneName")?.value ?? "";
+    const off = -d.getTimezoneOffset(), sign = off < 0 ? "−" : "+", a = Math.abs(off);
+    $$(".js-tz").forEach(e => e.textContent = `${zone} · UTC${sign}${String(Math.floor(a / 60)).padStart(2, "0")}:${String(a % 60).padStart(2, "0")}`);
+  }
+
+  // Battery (real values unless a simulation button is on)
+  function renderBattery() {
+    const level = state.low ? 0.15 : state.level, charging = state.charging || state.realCharging;
+    const p = Math.round(level * 100), c = p <= 10 ? "#e5484d" : p <= 20 ? "#f5a524" : "#2fb35a";
+    $$(".js-pct").forEach(e => e.textContent = p + "%");
+    $$(".js-fill").forEach(e => { e.style.width = p + "%"; e.style.background = c; });
+    $$(".js-bolt").forEach(e => e.textContent = charging ? "⚡" : "");
+    $$(".js-mini").forEach(e => e.style.opacity = (charging || p <= 20) ? 1 : 0);
+  }
+
+  // Spectrum: simulated music with a beat, log-spaced bands, fast attack / smooth decay
+  const meters = [...$$(".js-spectrum")].map(el => {
+    const n = +el.dataset.bars;
+    el.innerHTML = "<span></span>".repeat(n);
+    return { bars: [...el.children], values: new Array(n).fill(0) };
+  });
+  let t = 0;
+  function frame() {
+    t += 1 / 30;
+    const beat = Math.pow(Math.max(0, Math.sin(t * Math.PI * 2 * 2)), 8);
+    for (const m of meters) {
+      const n = m.values.length;
+      for (let i = 0; i < n; i++) {
+        const x = i / (n - 1);
+        const shape = 0.85 * Math.exp(-x * 2.2) + 0.25 + 0.2 * Math.sin(x * 9 + t * 1.3);
+        const wobble = 0.55 + 0.45 * Math.sin(t * (3 + i * 0.7) + i * 1.7);
+        let target = state.silent ? 0 : Math.min(1, shape * wobble + beat * (1 - x) * 0.5);
+        const v = m.values[i];
+        m.values[i] = target > v ? v + (target - v) * 0.6 : v * 0.86;
+        m.bars[i].style.height = Math.max(4, m.values[i] * 100) + "%";
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function toggle(id, key, after) {
+    const b = document.getElementById(id);
+    b.onclick = () => { state[key] = !state[key]; b.classList.toggle("on", state[key]); after(); };
+  }
+  toggle("btnSilence", "silent", () => document.body.classList.toggle("silent", state.silent));
+  toggle("btnLow", "low", renderBattery);
+  toggle("btnCharge", "charging", renderBattery);
+
+  tick(); setInterval(tick, 1000); renderBattery(); frame();
+  if (navigator.getBattery) navigator.getBattery().then(b => {
+    const u = () => { state.level = b.level; state.realCharging = b.charging; renderBattery(); };
+    u(); b.onlevelchange = b.onchargingchange = u;
+  });
+</script>
+</body>
+</html>
