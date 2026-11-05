@@ -4,11 +4,12 @@ A small floating glass widget for Windows 11, built with WinUI 3. It shows the t
 
 ```
 ┌──────────────────────────────┐
-│ 10:42 AM               ▭ 78% ⚡│
-│ Thursday, November 5          │
-│ India Standard Time · UTC+05:30│
-│▁▂▅▇▆▃▂▄▆▅▃▂▁▁▂▃▂▁▁▁▂▃▁▂▅▃▂▁   │
+│ 10:42 AM            ▭ 78% ⚡│
+│ Thursday, November 5         │
+│ India Standard Time·UTC+05:30│
+│▁▂▆▃▂▄▅▃▂▁▁▂▃▂▁▁▂▃▁▂▅▃▂▁ │
 └──────────────────────────────┘
+
 ```
 
 <!-- Add a screenshot here, e.g. ![Prism](docs/screenshot.png) -->
