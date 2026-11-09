@@ -25,6 +25,26 @@
                 <Setter Property="Background" Value="#8CFFFFFF" />
                 <Setter Property="BorderBrush" Value="#CCFFFFFF" />
             </Style>
+
+            <Style x:Key="PanelHeaderStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Padding" Value="8,6" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+            </Style>
+
+            <!-- Notification Center-style card -->
+            <SolidColorBrush x:Key="NotificationCardBrush" Color="#A6FFFFFF" />
+            <SolidColorBrush x:Key="NotificationCardBorderBrush" Color="#14000000" />
+
+            <!-- Follow-ups (starred notifications) -->
+            <SolidColorBrush x:Key="FollowUpBrush" Color="#F5A524" />
+            <SolidColorBrush x:Key="FollowUpTextBrush" Color="#9A5B00" />
+            <SolidColorBrush x:Key="FollowUpCardBrush" Color="#BFFFF4DC" />
+            <SolidColorBrush x:Key="FollowUpCardBorderBrush" Color="#66F5A524" />
+            <SolidColorBrush x:Key="FollowUpDueBrush" Color="#40F5A524" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

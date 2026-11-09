@@ -72,6 +72,61 @@
             <TextBlock x:Name="TimeZoneText" Text="India Standard Time · UTC+05:30" FontSize="12" Opacity="0.5"
                        Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
 
+            <!-- Notifications: collapsed summary row; click to expand -->
+            <Button x:Name="NotificationsHeader" Style="{StaticResource PanelHeaderStyle}" Margin="-8,10,-8,0"
+                    Click="NotificationsHeader_Click">
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Glyph="&#xEA8F;" FontSize="13" Opacity="0.65" VerticalAlignment="Center" />
+                    <TextBlock x:Name="NotificationsSummaryText" Grid.Column="1" Text="Notifications" FontSize="13"
+                               TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    <StackPanel x:Name="FollowUpBadge" Grid.Column="2" Orientation="Horizontal" Spacing="3"
+                                VerticalAlignment="Center" Visibility="Collapsed"
+                                ToolTipService.ToolTip="Follow-ups">
+                        <FontIcon Glyph="&#xE735;" FontSize="12" Foreground="{StaticResource FollowUpBrush}" />
+                        <TextBlock x:Name="FollowUpBadgeText" Text="0" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{StaticResource FollowUpTextBrush}" />
+                    </StackPanel>
+                    <FontIcon x:Name="NotificationsChevron" Grid.Column="3" Glyph="&#xE70D;" FontSize="10" Opacity="0.6"
+                              VerticalAlignment="Center" />
+                </Grid>
+            </Button>
+
+            <StackPanel x:Name="NotificationsPanel" Visibility="Collapsed" Spacing="8" Margin="0,6,0,2">
+                <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto" Margin="-4,0,-8,0" Padding="4,0,8,0">
+                    <StackPanel Spacing="8">
+                        <!-- Starred notifications, kept until marked done -->
+                        <StackPanel x:Name="FollowUpsSection" Spacing="8" Visibility="Collapsed" Margin="0,0,0,6">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <FontIcon Glyph="&#xE735;" FontSize="13" Foreground="{StaticResource FollowUpBrush}" />
+                                    <TextBlock Text="Follow-ups" FontSize="14" FontWeight="SemiBold" />
+                                </StackPanel>
+                                <TextBlock x:Name="FollowUpDueText" FontSize="11" Opacity="0.6"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                            <StackPanel x:Name="FollowUpsList" Spacing="6" />
+                        </StackPanel>
+
+                        <Grid x:Name="NotificationsToolbar">
+                            <TextBlock Text="Notifications" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <HyperlinkButton x:Name="ClearAllButton" Content="Clear all" FontSize="12" Padding="6,2"
+                                             HorizontalAlignment="Right" Click="ClearAllButton_Click" />
+                        </Grid>
+                        <StackPanel x:Name="NotificationsList" Spacing="8" />
+                    </StackPanel>
+                </ScrollViewer>
+                <TextBlock x:Name="NotificationsMessage" FontSize="12" Opacity="0.65" TextWrapping="Wrap"
+                           IsTextSelectionEnabled="True" Visibility="Collapsed" />
+                <Button x:Name="NotificationSettingsButton" Content="Open notification settings"
+                        HorizontalAlignment="Stretch" Visibility="Collapsed" Click="NotificationSettingsButton_Click" />
+            </StackPanel>
+
             <!-- Spectrum strip along the bottom edge; bars are added in code -->
             <Grid x:Name="SpectrumStrip"
                   Height="30"

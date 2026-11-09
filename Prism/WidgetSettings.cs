@@ -24,6 +24,9 @@ internal sealed class WidgetSettings
     [JsonConverter(typeof(JsonStringEnumConverter<AudioSource>))]
     public AudioSource SpectrumSource { get; set; } = AudioSource.Speakers;
 
+    /// <summary>From this time of day, pending follow-ups are highlighted (24-hour "HH:mm").</summary>
+    public string FollowUpReminderTime { get; set; } = "17:00";
+
     public static WidgetSettings Load()
     {
         try

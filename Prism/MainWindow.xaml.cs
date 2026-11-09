@@ -100,6 +100,7 @@ public sealed partial class MainWindow : Window
             _needsDefaultPlacement = false;
         }
         Root.XamlRoot.Changed += XamlRoot_Changed;
+        InitializeNotifications();
     }
 
     private void XamlRoot_Changed(XamlRoot sender, XamlRootChangedEventArgs args)
@@ -119,6 +120,13 @@ public sealed partial class MainWindow : Window
         AppWindow.ResizeClient(new SizeInt32(
             (int)Math.Ceiling(Root.DesiredSize.Width * scale),
             (int)Math.Ceiling(Root.DesiredSize.Height * scale)));
+
+        var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Nearest).WorkArea;
+        int overflow = AppWindow.Position.Y + AppWindow.Size.Height - (workArea.Y + workArea.Height);
+        if (overflow > 0)
+        {
+            AppWindow.Move(new PointInt32(AppWindow.Position.X, Math.Max(workArea.Y, AppWindow.Position.Y - overflow)));
+        }
     }
 
     private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
@@ -349,6 +357,7 @@ public sealed partial class MainWindow : Window
         PowerManager.BatteryStatusChanged -= OnPowerChanged;
         PowerManager.PowerSupplyStatusChanged -= OnPowerChanged;
         StopSpectrum();
+        StopNotifications();
         SavePosition();
         _tray.Dispose();
         Application.Current.Exit();

@@ -3,6 +3,9 @@ bin/
 obj/
 AppPackages/
 BundleArtifacts/
+Prism/Packaging/out/
+*.pfx
+*.cer
 
 # Visual Studio / Rider / VS Code
 .vs/
