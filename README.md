@@ -21,7 +21,8 @@ A small floating glass widget for Windows 11, built with WinUI 3. It shows the t
 - **Clock**: time, full date and local time zone with its UTC offset. Updates automatically when the time zone or daylight saving changes.
 - **Battery**: always shown in the top-right corner. The bar is green, then orange at 20% or below, then red at 10% or below. ⚡ appears while charging.
 - **Notifications**: a foldable panel listing the notifications in the Windows Notification Center, from all apps, grouped by app like the Notification Center. Dismiss one or clear all. Needs a one-time setup (see [Notifications setup](#notifications-setup)).
-- **Follow-ups**: star (☆) any notification to follow up on it. Starred items stay until you mark them done, even after the notification is gone. From 5 PM the panel's row turns amber to show how many are left.
+- **Follow-ups**: star (☆) any notification to follow up on it, or type your own follow-up. Items stay until you mark them done, even after the notification is gone. From 5 PM the panel's row turns amber to show how many are left.
+- **Follow-up history**: every follow-up you add, finish or unstar is logged to a CSV file, so you can review past days in Excel.
 - **Audio spectrum**: 40 bars that react to what your speakers are playing, or to your microphone. The strip fades in with sound and out when it's quiet.
 - **Floating window**:
   - Drag it anywhere; it remembers its position.
@@ -92,14 +93,16 @@ To undo the setup: run `Get-AppxPackage singingrocket.Prism | Remove-AppxPackage
 | Show notifications | Click the 🔔 row to expand or collapse it |
 | Dismiss a notification | Hover over it and click ✕, or **Clear all** |
 | Follow up on a notification | Hover over it and click ☆; click ★ again to unstar |
+| Add your own follow-up | Type in **Add a follow-up…** and press Enter or click + |
 | Finish a follow-up | Click ✓ in the **Follow-ups** section |
+| See past follow-ups | Click **History** in the Follow-ups section, or menu / tray → **Open follow-up history** |
 | Spectrum source | Menu → **Spectrum → Off / Speakers / Microphone** |
 | Transparency | Menu → **Transparency → Frosted / Medium / Clear / Crystal** |
 | Show / hide | Left-click the tray icon |
 | Undo click-through | Right-click the tray icon → **Click-through** |
 | Exit | Menu or tray icon → **Exit** |
 
-Settings (position, options, spectrum source) are saved in `%LOCALAPPDATA%\Prism\settings.json`. Follow-ups are saved in `followups.json` in the same folder. To change when follow-ups turn amber, exit Prism and edit `"FollowUpReminderTime": "17:00"` (24-hour) in `settings.json`.
+Settings (position, options, spectrum source) are saved in `%LOCALAPPDATA%\Prism\settings.json`. Open follow-ups are saved in `followups.json` in the same folder, and the history in `followup-history.csv` (columns: Date, Time, Event, Source, Title, Details, Received; rows are only ever added). To change when follow-ups turn amber, exit Prism and edit `"FollowUpReminderTime": "17:00"` (24-hour) in `settings.json`.
 
 ### About the audio spectrum
 
@@ -116,9 +119,10 @@ Prism/
   MainWindow.xaml(.cs)            The widget: layout, clock, battery, dragging, menus
   MainWindow.Spectrum.cs          Spectrum strip: bars, fade in/out, source selection
   MainWindow.Notifications.cs     Notification panel: refresh, app cards, dismiss, clear all
-  MainWindow.FollowUps.cs         Follow-ups: star toggle, Follow-ups section, end-of-day highlight
+  MainWindow.FollowUps.cs         Follow-ups: star toggle, manual entry, history, end-of-day highlight
   Notifications/NotificationFeed.cs  Reads the Notification Center (UserNotificationListener)
-  Notifications/FollowUpStore.cs  Saves starred notifications
+  Notifications/FollowUpStore.cs  Saves open follow-ups (starred and manual)
+  Notifications/FollowUpHistory.cs  Appends follow-up events to the history CSV
   Packaging/AppxManifest.xml      Identity package that grants notification access
   Packaging/Register-Prism.ps1    One-time setup: certificate, signing, registration
   Audio/AudioCapture.cs           Speaker (loopback) and microphone capture via Windows Core Audio

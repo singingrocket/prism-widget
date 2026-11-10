@@ -33,6 +33,7 @@
                     <RadioMenuFlyoutItem Text="Speakers" GroupName="Spectrum" Tag="Speakers" Click="SpectrumItem_Click" />
                     <RadioMenuFlyoutItem Text="Microphone" GroupName="Spectrum" Tag="Microphone" Click="SpectrumItem_Click" />
                 </MenuFlyoutSubItem>
+                <MenuFlyoutItem Text="Open follow-up history" Click="FollowUpHistoryButton_Click" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="Hide widget" Click="HideItem_Click" />
                 <MenuFlyoutItem Text="Exit" Click="ExitItem_Click" />
@@ -50,30 +51,30 @@
             </Border.Background>
         </Border>
 
-        <StackPanel Padding="24,20,24,20">
+        <StackPanel Padding="20,14,20,12">
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Name="TimeText"
                            Text="10:42"
                            FontSize="56"
                            FontWeight="SemiBold"
                            CharacterSpacing="-30"
-                           LineHeight="60"
+                           LineHeight="54"
                            LineStackingStrategy="BlockLineHeight" />
                 <TextBlock x:Name="AmPmText"
                            Text="AM"
                            FontSize="18"
                            FontWeight="Medium"
                            Opacity="0.55"
-                           Margin="6,0,0,8"
+                           Margin="6,0,0,6"
                            VerticalAlignment="Bottom" />
             </StackPanel>
 
-            <TextBlock x:Name="DateText" Text="Thursday, November 5" FontSize="15" Opacity="0.7" Margin="0,4,0,0" />
+            <TextBlock x:Name="DateText" Text="Thursday, November 5" FontSize="15" Opacity="0.7" Margin="0,2,0,0" />
             <TextBlock x:Name="TimeZoneText" Text="India Standard Time · UTC+05:30" FontSize="12" Opacity="0.5"
-                       Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
+                       Margin="0,1,0,0" TextTrimming="CharacterEllipsis" />
 
             <!-- Notifications: collapsed summary row; click to expand -->
-            <Button x:Name="NotificationsHeader" Style="{StaticResource PanelHeaderStyle}" Margin="-8,10,-8,0"
+            <Button x:Name="NotificationsHeader" Style="{StaticResource PanelHeaderStyle}" Margin="-8,6,-8,0"
                     Click="NotificationsHeader_Click">
                 <Grid ColumnSpacing="8">
                     <Grid.ColumnDefinitions>
@@ -97,18 +98,35 @@
                 </Grid>
             </Button>
 
-            <StackPanel x:Name="NotificationsPanel" Visibility="Collapsed" Spacing="8" Margin="0,6,0,2">
+            <StackPanel x:Name="NotificationsPanel" Visibility="Collapsed" Spacing="6" Margin="0,4,0,0">
                 <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto" Margin="-4,0,-8,0" Padding="4,0,8,0">
-                    <StackPanel Spacing="8">
-                        <!-- Starred notifications, kept until marked done -->
-                        <StackPanel x:Name="FollowUpsSection" Spacing="8" Visibility="Collapsed" Margin="0,0,0,6">
+                    <StackPanel Spacing="6">
+                        <!-- Starred notifications and manual follow-ups, kept until marked done -->
+                        <StackPanel x:Name="FollowUpsSection" Spacing="6" Margin="0,0,0,4">
                             <Grid>
-                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                     <FontIcon Glyph="&#xE735;" FontSize="13" Foreground="{StaticResource FollowUpBrush}" />
                                     <TextBlock Text="Follow-ups" FontSize="14" FontWeight="SemiBold" />
                                 </StackPanel>
-                                <TextBlock x:Name="FollowUpDueText" FontSize="11" Opacity="0.6"
-                                           HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" Spacing="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock x:Name="FollowUpDueText" FontSize="11" Opacity="0.6" VerticalAlignment="Center" />
+                                    <HyperlinkButton x:Name="FollowUpHistoryButton" Content="History" FontSize="12" Padding="6,2"
+                                                     ToolTipService.ToolTip="Open the follow-up history file"
+                                                     Click="FollowUpHistoryButton_Click" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid ColumnSpacing="6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="NewFollowUpBox" PlaceholderText="Add a follow-up…" FontSize="12"
+                                         MaxLength="300" KeyDown="NewFollowUpBox_KeyDown" />
+                                <Button x:Name="AddFollowUpButton" Grid.Column="1" Padding="8,6" VerticalAlignment="Stretch"
+                                        ToolTipService.ToolTip="Add follow-up" AutomationProperties.Name="Add follow-up"
+                                        Click="AddFollowUpButton_Click">
+                                    <FontIcon Glyph="&#xE710;" FontSize="12" />
+                                </Button>
                             </Grid>
                             <StackPanel x:Name="FollowUpsList" Spacing="6" />
                         </StackPanel>
@@ -130,7 +148,7 @@
             <!-- Spectrum strip along the bottom edge; bars are added in code -->
             <Grid x:Name="SpectrumStrip"
                   Height="30"
-                  Margin="-14,8,-14,-20"
+                  Margin="-10,6,-10,-12"
                   ColumnSpacing="2"
                   Opacity="0"
                   Visibility="Collapsed"
@@ -145,7 +163,7 @@
         <StackPanel x:Name="BatteryBadge"
                     Orientation="Horizontal"
                     Spacing="5"
-                    Margin="0,16,18,0"
+                    Margin="0,12,16,0"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     IsHitTestVisible="False">
@@ -180,7 +198,7 @@
         <StackPanel x:Name="Tools"
                     Orientation="Horizontal"
                     Spacing="6"
-                    Margin="0,12,12,0"
+                    Margin="0,8,10,0"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     Opacity="0">

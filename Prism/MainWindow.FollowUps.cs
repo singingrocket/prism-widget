@@ -1,10 +1,14 @@
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Prism.Notifications;
+using Windows.System;
 
 namespace Prism;
 
@@ -38,8 +42,7 @@ public sealed partial class MainWindow
         }
 
         string reminder = DateTime.Today.Add(FollowUpReminder).ToString("h:mm tt", CultureInfo.CurrentCulture);
-        FollowUpDueText.Text = due ? "Due now" : $"Due by {reminder}";
-        FollowUpsSection.Visibility = pending > 0 ? Visibility.Visible : Visibility.Collapsed;
+        FollowUpDueText.Text = pending == 0 ? string.Empty : due ? "Due now" : $"Due by {reminder}";
         FollowUpsList.Children.Clear();
         foreach (var followUp in _followUps.Items)
         {
@@ -56,7 +59,9 @@ public sealed partial class MainWindow
         var text = new StackPanel { Spacing = 2 };
         text.Children.Add(new TextBlock
         {
-            Text = $"{followUp.AppName} · {FormatNotificationTime(followUp.Time)}",
+            Text = followUp.AppName == FollowUpStore.ManualSource
+                ? $"Added manually · {FormatNotificationTime(followUp.Time)}"
+                : $"{followUp.AppName} · {FormatNotificationTime(followUp.Time)}",
             FontSize = 11,
             FontWeight = FontWeights.SemiBold,
             Foreground = (Brush)Application.Current.Resources["FollowUpTextBrush"],
@@ -104,6 +109,51 @@ public sealed partial class MainWindow
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(10, 8, 6, 8),
         };
+    }
+
+    private void AddManualFollowUp()
+    {
+        string text = NewFollowUpBox.Text.Trim();
+        if (text.Length == 0)
+        {
+            return;
+        }
+        _followUps.AddManual(text);
+        NewFollowUpBox.Text = string.Empty;
+        RenderNotifications();
+    }
+
+    private void AddFollowUpButton_Click(object sender, RoutedEventArgs e) => AddManualFollowUp();
+
+    private void NewFollowUpBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter)
+        {
+            AddManualFollowUp();
+            e.Handled = true;
+        }
+    }
+
+    private void FollowUpHistoryButton_Click(object sender, RoutedEventArgs e) => OpenFollowUpHistory();
+
+    /// <summary>Opens the history file in its default app (usually Excel), creating it if needed.</summary>
+    private void OpenFollowUpHistory()
+    {
+        if (!FollowUpHistory.Exists)
+        {
+            Directory.CreateDirectory(WidgetSettings.DataFolder);
+            File.WriteAllText(FollowUpHistory.FilePath, FollowUpHistory.Header + Environment.NewLine,
+                new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+        }
+        try
+        {
+            Process.Start(new ProcessStartInfo(FollowUpHistory.FilePath) { UseShellExecute = true });
+        }
+        catch (Win32Exception)
+        {
+            // No app is associated with .csv files; show the file in Explorer instead.
+            Process.Start("explorer.exe", $"/select,\"{FollowUpHistory.FilePath}\"");
+        }
     }
 
     /// <summary>Star that adds or removes a notification from the follow-ups.</summary>

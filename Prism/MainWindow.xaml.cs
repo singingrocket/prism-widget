@@ -346,6 +346,7 @@ public sealed partial class MainWindow : Window
         new("Lock position", _settings.Locked, () => SetLocked(!_settings.Locked)),
         new("Click-through", _settings.ClickThrough, () => SetClickThrough(!_settings.ClickThrough)),
         new("Start with Windows", StartupRegistration.IsEnabled, () => StartupRegistration.SetEnabled(!StartupRegistration.IsEnabled)),
+        new("Open follow-up history", false, OpenFollowUpHistory),
         null,
         new("Exit", false, Close),
     ];
