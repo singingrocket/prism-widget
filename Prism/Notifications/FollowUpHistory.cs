@@ -11,13 +11,17 @@ internal static class FollowUpHistory
 {
     public static readonly string FilePath = Path.Combine(WidgetSettings.DataFolder, "followup-history.csv");
 
-    public const string Header = "Date,Time,Event,Source,Title,Details,Received";
+    public const string Header = "Date,Time,Event,Source,Title,Details,Received,Comment";
+    private const string HeaderWithoutComment = "Date,Time,Event,Source,Title,Details,Received";
+
+    private static bool _headerChecked;
 
     public static bool Exists => File.Exists(FilePath);
 
-    /// <summary>Records an event such as "Added", "Done" or "Removed".</summary>
-    public static void Log(string eventName, FollowUp followUp, DateTimeOffset? at = null)
+    /// <summary>Records an event such as "Added", "Done" or "Removed", with an optional closing comment.</summary>
+    public static void Log(string eventName, FollowUp followUp, DateTimeOffset? at = null, string? comment = null)
     {
+        UpgradeHeader();
         var when = (at ?? DateTimeOffset.Now).LocalDateTime;
         string line = string.Join(",",
             when.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
@@ -26,7 +30,8 @@ internal static class FollowUpHistory
             Escape(followUp.AppName),
             Escape(followUp.Title),
             Escape(followUp.Body),
-            followUp.Time.LocalDateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture));
+            followUp.Time.LocalDateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
+            Escape(comment ?? string.Empty));
 
         try
         {
@@ -39,6 +44,32 @@ internal static class FollowUpHistory
                 writer.WriteLine(Header);
             }
             writer.WriteLine(line);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    /// <summary>Adds the Comment column to history files created before comments existed.</summary>
+    private static void UpgradeHeader()
+    {
+        if (_headerChecked)
+        {
+            return;
+        }
+        _headerChecked = true;
+        try
+        {
+            if (!File.Exists(FilePath))
+            {
+                return;
+            }
+            string[] lines = File.ReadAllLines(FilePath);
+            if (lines.Length > 0 && lines[0] == HeaderWithoutComment)
+            {
+                lines[0] = Header;
+                File.WriteAllLines(FilePath, lines, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+            }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

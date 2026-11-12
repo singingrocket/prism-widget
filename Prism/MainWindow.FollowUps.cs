@@ -18,6 +18,11 @@ public sealed partial class MainWindow
 
     private readonly FollowUpStore _followUps = new();
 
+    // Closing-comment box state, kept while the list is rebuilt by refreshes.
+    private string? _commentKey;
+    private string _commentDraft = string.Empty;
+    private bool _commentFocused;
+
     private TimeSpan FollowUpReminder =>
         TimeSpan.TryParseExact(_settings.FollowUpReminderTime, @"hh\:mm", CultureInfo.InvariantCulture, out var time)
             ? time
@@ -43,18 +48,25 @@ public sealed partial class MainWindow
 
         string reminder = DateTime.Today.Add(FollowUpReminder).ToString("h:mm tt", CultureInfo.CurrentCulture);
         FollowUpDueText.Text = pending == 0 ? string.Empty : due ? "Due now" : $"Due by {reminder}";
+        if (_commentKey is not null && _followUps.Items.All(f => f.Key != _commentKey))
+        {
+            ResetComment();
+        }
+        bool refocus = _commentFocused;
         FollowUpsList.Children.Clear();
         foreach (var followUp in _followUps.Items)
         {
-            FollowUpsList.Children.Add(CreateFollowUpCard(followUp));
+            FollowUpsList.Children.Add(CreateFollowUpCard(followUp, refocus));
         }
     }
 
-    private Border CreateFollowUpCard(FollowUp followUp)
+    private Border CreateFollowUpCard(FollowUp followUp, bool refocusComment)
     {
-        var grid = new Grid { ColumnSpacing = 6 };
+        var grid = new Grid { ColumnSpacing = 6, RowSpacing = 6 };
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
         var text = new StackPanel { Spacing = 2 };
         text.Children.Add(new TextBlock
@@ -90,15 +102,39 @@ public sealed partial class MainWindow
         }
         grid.Children.Add(text);
 
-        var done = CreateIconButton("\uE73E", "Mark as done");
-        done.VerticalAlignment = VerticalAlignment.Center;
-        done.Click += (_, _) =>
+        bool commenting = _commentKey == followUp.Key;
+        var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
+        var comment = CreateIconButton("\uE90A", commenting ? "Cancel comment" : "Close with a comment");
+        comment.Click += (_, _) =>
         {
-            _followUps.Complete(followUp.Key);
-            RenderNotifications();
+            if (_commentKey == followUp.Key)
+            {
+                ResetComment();
+            }
+            else
+            {
+                _commentKey = followUp.Key;
+                _commentDraft = string.Empty;
+                _commentFocused = true;
+            }
+            RenderFollowUps();
+            ResizeToContent();
         };
-        Grid.SetColumn(done, 1);
-        grid.Children.Add(done);
+        actions.Children.Add(comment);
+
+        var done = CreateIconButton("\uE73E", "Mark as done");
+        done.Click += (_, _) => CloseFollowUp(followUp.Key, comment: null);
+        actions.Children.Add(done);
+        Grid.SetColumn(actions, 1);
+        grid.Children.Add(actions);
+
+        if (commenting)
+        {
+            var commentRow = CreateCommentRow(followUp.Key, refocusComment);
+            Grid.SetRow(commentRow, 1);
+            Grid.SetColumnSpan(commentRow, 2);
+            grid.Children.Add(commentRow);
+        }
 
         return new Border
         {
@@ -109,6 +145,84 @@ public sealed partial class MainWindow
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(10, 8, 6, 8),
         };
+    }
+
+    /// <summary>Comment box and Close button shown under a follow-up.</summary>
+    private Grid CreateCommentRow(string key, bool focus)
+    {
+        var row = new Grid { ColumnSpacing = 6 };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        var box = new TextBox
+        {
+            PlaceholderText = "Closing comment (optional)…",
+            Text = _commentDraft,
+            FontSize = 12,
+            MaxLength = 500,
+            TextWrapping = TextWrapping.Wrap,
+            AcceptsReturn = false,
+        };
+        AutomationProperties.SetName(box, "Closing comment");
+        box.TextChanged += (_, _) => _commentDraft = box.Text;
+        box.GotFocus += (_, _) => _commentFocused = true;
+        box.LostFocus += (_, _) => _commentFocused = false;
+        box.KeyDown += (_, e) =>
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                CloseFollowUp(key, box.Text);
+                e.Handled = true;
+            }
+            else if (e.Key == VirtualKey.Escape)
+            {
+                ResetComment();
+                RenderFollowUps();
+                ResizeToContent();
+                e.Handled = true;
+            }
+        };
+        if (focus)
+        {
+            box.Loaded += (_, _) =>
+            {
+                box.Focus(FocusState.Programmatic);
+                box.SelectionStart = box.Text.Length;
+            };
+        }
+        row.Children.Add(box);
+
+        var close = new Button
+        {
+            Content = "Close",
+            FontSize = 12,
+            Padding = new Thickness(12, 4, 12, 5),
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Style = (Style)Application.Current.Resources["AccentButtonStyle"],
+        };
+        AutomationProperties.SetName(close, "Close follow-up");
+        close.Click += (_, _) => CloseFollowUp(key, box.Text);
+        Grid.SetColumn(close, 1);
+        row.Children.Add(close);
+        return row;
+    }
+
+    private void CloseFollowUp(string key, string? comment)
+    {
+        if (_commentKey == key)
+        {
+            ResetComment();
+        }
+        _followUps.Complete(key, comment);
+        RenderNotifications();
+        ResizeToContent();
+    }
+
+    private void ResetComment()
+    {
+        _commentKey = null;
+        _commentDraft = string.Empty;
+        _commentFocused = false;
     }
 
     private void AddManualFollowUp()

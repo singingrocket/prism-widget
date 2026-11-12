@@ -19,6 +19,9 @@ internal sealed class WidgetSettings
     public bool AlwaysOnTop { get; set; } = true;
     public bool Locked { get; set; }
     public bool ClickThrough { get; set; }
+
+    /// <summary>Slide out of the mouse's way, except when it approaches from the right (grab) side.</summary>
+    public bool MoveAwayFromMouse { get; set; }
     public double Transparency { get; set; } = 0.4;
 
     [JsonConverter(typeof(JsonStringEnumConverter<AudioSource>))]

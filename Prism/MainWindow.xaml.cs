@@ -80,6 +80,7 @@ public sealed partial class MainWindow : Window
         _tray = new TrayIcon(_hwnd, "Prism") { LeftClick = ToggleVisibility, MenuProvider = BuildTrayMenu };
         UpdatePinGlyph();
         InitializeSpectrum();
+        InitializeDodge();
 
         Root.Loaded += Root_Loaded;
         Closed += MainWindow_Closed;
@@ -243,13 +244,14 @@ public sealed partial class MainWindow : Window
             return;
         }
         _dragging = false;
+        ResetDodge();
         SavePosition();
     }
 
     private void SavePosition()
     {
-        _settings.X = AppWindow.Position.X;
-        _settings.Y = AppWindow.Position.Y;
+        _settings.X = HomePosition.X;
+        _settings.Y = HomePosition.Y;
         _settings.Save();
     }
 
@@ -258,6 +260,7 @@ public sealed partial class MainWindow : Window
         AlwaysOnTopItem.IsChecked = _settings.AlwaysOnTop;
         LockItem.IsChecked = _settings.Locked;
         ClickThroughItem.IsChecked = _settings.ClickThrough;
+        MoveAwayItem.IsChecked = _settings.MoveAwayFromMouse;
         StartupItem.IsChecked = StartupRegistration.IsEnabled;
         foreach (var item in TransparencyMenu.Items.OfType<RadioMenuFlyoutItem>())
         {
@@ -345,6 +348,7 @@ public sealed partial class MainWindow : Window
         new("Always on top", _settings.AlwaysOnTop, () => SetAlwaysOnTop(!_settings.AlwaysOnTop)),
         new("Lock position", _settings.Locked, () => SetLocked(!_settings.Locked)),
         new("Click-through", _settings.ClickThrough, () => SetClickThrough(!_settings.ClickThrough)),
+        new("Move away from mouse", _settings.MoveAwayFromMouse, () => SetMoveAway(!_settings.MoveAwayFromMouse)),
         new("Start with Windows", StartupRegistration.IsEnabled, () => StartupRegistration.SetEnabled(!StartupRegistration.IsEnabled)),
         new("Open follow-up history", false, OpenFollowUpHistory),
         null,
@@ -359,6 +363,7 @@ public sealed partial class MainWindow : Window
         PowerManager.PowerSupplyStatusChanged -= OnPowerChanged;
         StopSpectrum();
         StopNotifications();
+        _dodgeTimer?.Stop();
         SavePosition();
         _tray.Dispose();
         Application.Current.Exit();

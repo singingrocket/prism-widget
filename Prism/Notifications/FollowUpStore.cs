@@ -64,13 +64,13 @@ internal sealed class FollowUpStore
         Save();
     }
 
-    public void Complete(string key)
+    public void Complete(string key, string? comment = null)
     {
         var existing = _items.FirstOrDefault(f => f.Key == key);
         if (existing is not null)
         {
             _items.Remove(existing);
-            FollowUpHistory.Log("Done", existing);
+            FollowUpHistory.Log("Done", existing, comment: string.IsNullOrWhiteSpace(comment) ? null : comment.Trim());
             Save();
         }
     }

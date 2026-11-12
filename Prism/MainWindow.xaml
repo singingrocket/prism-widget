@@ -17,10 +17,12 @@
           PointerCaptureLost="Root_PointerCaptureLost">
 
         <Grid.ContextFlyout>
-            <MenuFlyout x:Name="WidgetMenu" ShouldConstrainToRootBounds="False" Opening="WidgetMenu_Opening">
+            <MenuFlyout x:Name="WidgetMenu" ShouldConstrainToRootBounds="False" Opening="WidgetMenu_Opening"
+                        Opened="WidgetMenu_Opened" Closed="WidgetMenu_Closed">
                 <ToggleMenuFlyoutItem x:Name="AlwaysOnTopItem" Text="Always on top" Click="AlwaysOnTopItem_Click" />
                 <ToggleMenuFlyoutItem x:Name="LockItem" Text="Lock position" Click="LockItem_Click" />
                 <ToggleMenuFlyoutItem x:Name="ClickThroughItem" Text="Click-through" Click="ClickThroughItem_Click" />
+                <ToggleMenuFlyoutItem x:Name="MoveAwayItem" Text="Move away from mouse" Click="MoveAwayItem_Click" />
                 <ToggleMenuFlyoutItem x:Name="StartupItem" Text="Start with Windows" Click="StartupItem_Click" />
                 <MenuFlyoutSubItem x:Name="TransparencyMenu" Text="Transparency">
                     <RadioMenuFlyoutItem Text="Frosted" GroupName="Transparency" Tag="0" Click="TransparencyItem_Click" />
@@ -182,6 +184,18 @@
             <TextBlock x:Name="BatteryPercentText" Text="78%" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
             <FontIcon x:Name="ChargingIcon" Glyph="&#xE945;" FontSize="11" Opacity="0.7" VerticalAlignment="Center" />
         </StackPanel>
+
+        <!-- Grab side for "Move away from mouse": approaching from here doesn't push the widget away -->
+        <Border x:Name="GrabHandle"
+                Width="4"
+                Height="32"
+                Margin="0,0,4,0"
+                CornerRadius="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Background="#40000000"
+                Visibility="Collapsed"
+                IsHitTestVisible="False" />
 
         <!-- Soft glass edge; also hides the stepped pixels of the rounded window shape -->
         <Border IsHitTestVisible="False" BorderThickness="1" CornerRadius="{StaticResource WidgetCornerRadius}">

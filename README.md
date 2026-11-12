@@ -29,6 +29,7 @@ A small floating glass widget for Windows 11, built with WinUI 3. It shows the t
   - Always on top, or a normal window.
   - Lock position.
   - Click-through, so clicks pass to the windows underneath.
+  - Move away from mouse: the widget slides out of the way when the pointer comes near, and slides back afterwards. Approach from the right edge (marked with a grip bar) to use or drag it.
   - Four transparency levels.
 - **Tray icon**: show or hide the widget, change options, or exit.
 - **Start with Windows**: optional.
@@ -95,6 +96,8 @@ To undo the setup: run `Get-AppxPackage singingrocket.Prism | Remove-AppxPackage
 | Follow up on a notification | Hover over it and click ☆; click ★ again to unstar |
 | Add your own follow-up | Type in **Add a follow-up…** and press Enter or click + |
 | Finish a follow-up | Click ✓ in the **Follow-ups** section |
+| Finish with a comment | Click 💬, type a comment, then press Enter or click **Close** (Esc cancels) |
+| Move away from mouse on/off | Menu or tray icon → **Move away from mouse** |
 | See past follow-ups | Click **History** in the Follow-ups section, or menu / tray → **Open follow-up history** |
 | Spectrum source | Menu → **Spectrum → Off / Speakers / Microphone** |
 | Transparency | Menu → **Transparency → Frosted / Medium / Clear / Crystal** |
@@ -102,7 +105,7 @@ To undo the setup: run `Get-AppxPackage singingrocket.Prism | Remove-AppxPackage
 | Undo click-through | Right-click the tray icon → **Click-through** |
 | Exit | Menu or tray icon → **Exit** |
 
-Settings (position, options, spectrum source) are saved in `%LOCALAPPDATA%\Prism\settings.json`. Open follow-ups are saved in `followups.json` in the same folder, and the history in `followup-history.csv` (columns: Date, Time, Event, Source, Title, Details, Received; rows are only ever added). To change when follow-ups turn amber, exit Prism and edit `"FollowUpReminderTime": "17:00"` (24-hour) in `settings.json`.
+Settings (position, options, spectrum source) are saved in `%LOCALAPPDATA%\Prism\settings.json`. Open follow-ups are saved in `followups.json` in the same folder, and the history in `followup-history.csv` (columns: Date, Time, Event, Source, Title, Details, Received, Comment; rows are only ever added). To change when follow-ups turn amber, exit Prism and edit `"FollowUpReminderTime": "17:00"` (24-hour) in `settings.json`.
 
 ### About the audio spectrum
 
@@ -119,7 +122,8 @@ Prism/
   MainWindow.xaml(.cs)            The widget: layout, clock, battery, dragging, menus
   MainWindow.Spectrum.cs          Spectrum strip: bars, fade in/out, source selection
   MainWindow.Notifications.cs     Notification panel: refresh, app cards, dismiss, clear all
-  MainWindow.FollowUps.cs         Follow-ups: star toggle, manual entry, history, end-of-day highlight
+  MainWindow.FollowUps.cs         Follow-ups: star toggle, manual entry, closing comments, history, end-of-day highlight
+  MainWindow.Dodge.cs             Move away from mouse: slide aside, return home, right-side grab
   Notifications/NotificationFeed.cs  Reads the Notification Center (UserNotificationListener)
   Notifications/FollowUpStore.cs  Saves open follow-ups (starred and manual)
   Notifications/FollowUpHistory.cs  Appends follow-up events to the history CSV
