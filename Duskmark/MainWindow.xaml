@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window
-    x:Class="Prism.MainWindow"
+    x:Class="Duskmark.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Prism">
+    Title="Duskmark">
 
     <Grid x:Name="Root"
           Width="300"

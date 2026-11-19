@@ -1,4 +1,4 @@
-# Prism
+# Duskmark
 
 A small floating glass widget for Windows 11, built with WinUI 3. It shows the time, date, time zone and battery level, a foldable panel with your Windows notifications and follow-ups, and a tiny audio spectrum analyzer along the bottom edge. The glass is styled after the frosted look of recent macOS versions.
 
@@ -13,7 +13,7 @@ A small floating glass widget for Windows 11, built with WinUI 3. It shows the t
 
 ```
 
-![Prism](Screenshot.png)
+![Duskmark](Screenshot.png)
 
 ## Features
 
@@ -44,47 +44,47 @@ A small floating glass widget for Windows 11, built with WinUI 3. It shows the t
 
 ```powershell
 git clone https://github.com/singingrocket/prism-widget.git
-cd prism-widget\Prism
+cd prism-widget\Duskmark
 dotnet run
 ```
 
 To make a standalone copy for everyday use:
 
 ```powershell
-dotnet publish -c Release -o C:\Prism
-C:\Prism\Prism.exe
+dotnet publish -c Release -o C:\Duskmark
+C:\Duskmark\Duskmark.exe
 ```
 
-If you want **Start with Windows**, turn it on from the published copy. Prism registers whichever `.exe` is running when you enable it.
+If you want **Start with Windows**, turn it on from the published copy. Duskmark registers whichever `.exe` is running when you enable it.
 
 ## Notifications setup
 
-Windows only lets apps with a package identity read other apps' notifications. Prism stays a normal `.exe`, and a small signed identity package links it to that permission. Run this once from the repository folder (you need administrator rights; approve the UAC prompt):
+Windows only lets apps with a package identity read other apps' notifications. Duskmark stays a normal `.exe`, and a small signed identity package links it to that permission. Run this once from the repository folder (you need administrator rights; approve the UAC prompt):
 
 ```powershell
-.\Prism\Packaging\Register-Prism.ps1
+.\Duskmark\Packaging\Register-Duskmark.ps1
 ```
 
 The script:
 
 1. Creates a self-signed code-signing certificate (`CN=singingrocket`) in your user certificate store.
 2. Trusts it on this PC (Local Machine → Trusted People). This is the step that needs administrator rights.
-3. Builds and signs the identity package from `Prism\Packaging\AppxManifest.xml`.
-4. Registers it for your user, pointing at the folder that contains `Prism.exe`.
+3. Builds and signs the identity package from `Duskmark\Packaging\AppxManifest.xml`.
+4. Registers it for your user, pointing at the folder that contains `Duskmark.exe`.
 
 By default it points at the Debug build folder. After `dotnet publish`, run it again with the new folder:
 
 ```powershell
-.\Prism\Packaging\Register-Prism.ps1 -ExeFolder C:\Prism
+.\Duskmark\Packaging\Register-Duskmark.ps1 -ExeFolder C:\Duskmark
 ```
 
-Without the setup, Prism still runs; the panel just says "Notifications aren't set up". You can switch access off at any time under **Settings → Privacy & security → Notifications**.
+Without the setup, Duskmark still runs; the panel just says "Notifications aren't set up". You can switch access off at any time under **Settings → Privacy & security → Notifications**.
 
-To undo the setup: run `Get-AppxPackage singingrocket.Prism | Remove-AppxPackage`, then delete the "Prism package signing" certificate from your user store and from Local Machine → Trusted People.
+To undo the setup: run `Get-AppxPackage singingrocket.Duskmark | Remove-AppxPackage`, then delete the "Duskmark package signing" certificate from your user store and from Local Machine → Trusted People.
 
-**Limits:** Prism shows what's in the Notification Center. Clicking a notification doesn't open its app, and notification buttons (like Reply) aren't shown, because Windows doesn't let other apps trigger them. The widget is always on top, so notification text is visible to anyone near your screen.
+**Limits:** Duskmark shows what's in the Notification Center. Clicking a notification doesn't open its app, and notification buttons (like Reply) aren't shown, because Windows doesn't let other apps trigger them. The widget is always on top, so notification text is visible to anyone near your screen.
 
-## Using Prism
+## Using Duskmark
 
 | Action | How |
 |---|---|
@@ -105,7 +105,7 @@ To undo the setup: run `Get-AppxPackage singingrocket.Prism | Remove-AppxPackage
 | Undo click-through | Right-click the tray icon → **Click-through** |
 | Exit | Menu or tray icon → **Exit** |
 
-Settings (position, options, spectrum source) are saved in `%LOCALAPPDATA%\Prism\settings.json`. Open follow-ups are saved in `followups.json` in the same folder, and the history in `followup-history.csv` (columns: Date, Time, Event, Source, Title, Details, Received, Comment; rows are only ever added). To change when follow-ups turn amber, exit Prism and edit `"FollowUpReminderTime": "17:00"` (24-hour) in `settings.json`.
+Settings (position, options, spectrum source) are saved in `%LOCALAPPDATA%\Duskmark\settings.json`. Open follow-ups are saved in `followups.json` in the same folder, and the history in `followup-history.csv` (columns: Date, Time, Event, Source, Title, Details, Received, Comment; rows are only ever added). To change when follow-ups turn amber, exit Duskmark and edit `"FollowUpReminderTime": "17:00"` (24-hour) in `settings.json`.
 
 ### About the audio spectrum
 
@@ -117,7 +117,7 @@ Settings (position, options, spectrum source) are saved in `%LOCALAPPDATA%\Prism
 ## Project structure
 
 ```
-Prism/
+Duskmark/
   App.xaml(.cs)                   App start-up, single-instance check, shared styles
   MainWindow.xaml(.cs)            The widget: layout, clock, battery, dragging, menus
   MainWindow.Spectrum.cs          Spectrum strip: bars, fade in/out, source selection
@@ -128,7 +128,7 @@ Prism/
   Notifications/FollowUpStore.cs  Saves open follow-ups (starred and manual)
   Notifications/FollowUpHistory.cs  Appends follow-up events to the history CSV
   Packaging/AppxManifest.xml      Identity package that grants notification access
-  Packaging/Register-Prism.ps1    One-time setup: certificate, signing, registration
+  Packaging/Register-Duskmark.ps1    One-time setup: certificate, signing, registration
   Audio/AudioCapture.cs           Speaker (loopback) and microphone capture via Windows Core Audio
   Audio/SpectrumAnalyzer.cs       FFT and log-spaced frequency bands with smoothing
   Audio/CoreAudioInterop.cs       Windows Core Audio (WASAPI) definitions

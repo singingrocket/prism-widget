@@ -3,7 +3,7 @@ using Windows.Storage.Streams;
 using Windows.UI.Notifications;
 using Windows.UI.Notifications.Management;
 
-namespace Prism.Notifications;
+namespace Duskmark.Notifications;
 
 internal enum NotificationAccess { NoIdentity, Denied, Allowed }
 

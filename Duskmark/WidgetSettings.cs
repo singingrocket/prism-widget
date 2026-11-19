@@ -1,14 +1,14 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Win32;
-using Prism.Audio;
+using Duskmark.Audio;
 
-namespace Prism;
+namespace Duskmark;
 
 internal sealed class WidgetSettings
 {
     public static readonly string DataFolder = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Prism");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Duskmark");
 
     private static readonly string FilePath = Path.Combine(DataFolder, "settings.json");
 
@@ -61,7 +61,7 @@ internal sealed class WidgetSettings
 internal static class StartupRegistration
 {
     private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string ValueName = "Prism";
+    private const string ValueName = "Duskmark";
 
     public static bool IsEnabled
     {

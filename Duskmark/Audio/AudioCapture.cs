@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
-using static Prism.Audio.CoreAudioInterop;
+using static Duskmark.Audio.CoreAudioInterop;
 
-namespace Prism.Audio;
+namespace Duskmark.Audio;
 
 internal enum AudioSource { Off, Speakers, Microphone }
 
@@ -33,7 +33,7 @@ internal sealed class AudioCapture : IDisposable
             return;
         }
         _running = true;
-        _thread = new Thread(() => Run(source)) { IsBackground = true, Name = "Prism audio capture" };
+        _thread = new Thread(() => Run(source)) { IsBackground = true, Name = "Duskmark audio capture" };
         _thread.SetApartmentState(ApartmentState.MTA);
         _thread.Start();
     }

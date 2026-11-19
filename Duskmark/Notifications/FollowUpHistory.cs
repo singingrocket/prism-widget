@@ -1,10 +1,10 @@
 using System.Globalization;
 using System.Text;
 
-namespace Prism.Notifications;
+namespace Duskmark.Notifications;
 
 /// <summary>
-/// Append-only log of follow-up activity in %LOCALAPPDATA%\Prism\followup-history.csv,
+/// Append-only log of follow-up activity in %LOCALAPPDATA%\Duskmark\followup-history.csv,
 /// so past days can be reviewed (for example in Excel, filtered by Date).
 /// </summary>
 internal static class FollowUpHistory

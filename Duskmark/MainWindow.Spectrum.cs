@@ -2,9 +2,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
-using Prism.Audio;
+using Duskmark.Audio;
 
-namespace Prism;
+namespace Duskmark;
 
 public sealed partial class MainWindow
 {

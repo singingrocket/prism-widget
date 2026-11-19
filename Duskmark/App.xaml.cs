@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml;
 
-namespace Prism;
+namespace Duskmark;
 
 public partial class App : Application
 {
@@ -14,7 +14,7 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        _singleInstance = new Mutex(true, @"Local\Prism.SingleInstance", out bool createdNew);
+        _singleInstance = new Mutex(true, @"Local\Duskmark.SingleInstance", out bool createdNew);
         if (!createdNew)
         {
             Exit();

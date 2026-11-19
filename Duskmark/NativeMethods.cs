@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Prism;
+namespace Duskmark;
 
 internal static class NativeMethods
 {

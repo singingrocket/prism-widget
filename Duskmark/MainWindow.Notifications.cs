@@ -6,9 +6,9 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Shapes;
-using Prism.Notifications;
+using Duskmark.Notifications;
 
-namespace Prism;
+namespace Duskmark;
 
 public sealed partial class MainWindow
 {
@@ -98,8 +98,8 @@ public sealed partial class MainWindow
 
         string? message = _notificationAccess switch
         {
-            NotificationAccess.NoIdentity => "Run Prism\\Packaging\\Register-Prism.ps1 once, then start Prism again.",
-            NotificationAccess.Denied => "Allow Prism under Settings → Privacy & security → Notifications.",
+            NotificationAccess.NoIdentity => "Run Duskmark\\Packaging\\Register-Duskmark.ps1 once, then start Duskmark again.",
+            NotificationAccess.Denied => "Allow Duskmark under Settings → Privacy & security → Notifications.",
             _ when count == 0 => "You're all caught up.",
             _ => null,
         };

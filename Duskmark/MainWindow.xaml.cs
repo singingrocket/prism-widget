@@ -11,7 +11,7 @@ using Windows.System.Power;
 using Windows.UI;
 using WinRT.Interop;
 
-namespace Prism;
+namespace Duskmark;
 
 public sealed partial class MainWindow : Window
 {
@@ -51,7 +51,7 @@ public sealed partial class MainWindow : Window
         _presenter.IsAlwaysOnTop = _settings.AlwaysOnTop;
         AppWindow.SetPresenter(_presenter);
         AppWindow.IsShownInSwitchers = false;
-        AppWindow.Title = "Prism";
+        AppWindow.Title = "Duskmark";
         AppWindow.Changed += AppWindow_Changed;
         NativeMethods.SetClickThrough(_hwnd, _settings.ClickThrough);
 
@@ -77,7 +77,7 @@ public sealed partial class MainWindow : Window
         PowerManager.PowerSupplyStatusChanged += OnPowerChanged;
         UpdateBattery();
 
-        _tray = new TrayIcon(_hwnd, "Prism") { LeftClick = ToggleVisibility, MenuProvider = BuildTrayMenu };
+        _tray = new TrayIcon(_hwnd, "Duskmark") { LeftClick = ToggleVisibility, MenuProvider = BuildTrayMenu };
         UpdatePinGlyph();
         InitializeSpectrum();
         InitializeDodge();

@@ -1,4 +1,4 @@
-namespace Prism.Audio;
+namespace Duskmark.Audio;
 
 /// <summary>
 /// Turns recent audio samples into smoothed 0..1 levels for log-spaced frequency bands.

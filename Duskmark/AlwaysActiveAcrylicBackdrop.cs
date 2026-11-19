@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
-namespace Prism;
+namespace Duskmark;
 
 /// <summary>
 /// Light acrylic backdrop that stays translucent even when the window is not focused

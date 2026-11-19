@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Prism.Audio;
+namespace Duskmark.Audio;
 
 /// <summary>Minimal Windows Core Audio (WASAPI) COM definitions used for capture.</summary>
 internal static class CoreAudioInterop

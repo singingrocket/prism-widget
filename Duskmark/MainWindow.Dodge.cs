@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Windows.Graphics;
 
-namespace Prism;
+namespace Duskmark;
 
 /// <summary>
 /// "Move away from mouse": the widget slides out of the pointer's way, except when the pointer
@@ -86,19 +86,20 @@ public sealed partial class MainWindow
         int margin = (int)(DodgeMarginDip * scale);
         NativeMethods.GetCursorPos(out var cursor);
         var size = AppWindow.Size;
-        var position = AppWindow.Position;
+        // Judge against where the widget is going, not where it is mid-slide, so a slide can't re-trigger itself.
+        var resting = _dodgeTarget ?? AppWindow.Position;
 
-        if (IsNear(cursor, position, size, margin))
+        if (IsNear(cursor, resting, size, margin))
         {
             if (!_dodgeEngaged && !busy)
             {
-                if (cursor.X >= position.X + size.Width - (int)(GrabSideDip * scale))
+                if (cursor.X >= resting.X + size.Width - (int)(GrabSideDip * scale))
                 {
                     _dodgeEngaged = true;
                 }
                 else
                 {
-                    DodgeFrom(cursor, _dodgeTarget ?? position, size, margin);
+                    DodgeFrom(cursor, size, margin);
                 }
             }
             _awayFromHomeSince = null;
@@ -114,8 +115,8 @@ public sealed partial class MainWindow
             _awayFromHomeSince ??= DateTime.Now;
             if (DateTime.Now - _awayFromHomeSince >= ReturnHomeDelay)
             {
+                // _dodgeHome is cleared on arrival, so a pointer meeting the widget on its way back still uses the real home.
                 _dodgeTarget = home;
-                _dodgeHome = null;
                 _awayFromHomeSince = null;
             }
         }
@@ -125,38 +126,64 @@ public sealed partial class MainWindow
         }
     }
 
-    /// <summary>Slides by the widget's height (down, or up if there's no room), sideways as a last resort.</summary>
-    private void DodgeFrom(NativeMethods.POINT cursor, PointInt32 from, SizeInt32 size, int margin)
+    /// <summary>
+    /// Picks the spot nearest home, in any of 8 directions or a screen corner, that stays on screen and clears the pointer.
+    /// If no spot clears it (a very large widget), the widget stays where it is instead of jumping around.
+    /// </summary>
+    private void DodgeFrom(NativeMethods.POINT cursor, SizeInt32 size, int margin)
     {
-        var work = DisplayArea.GetFromPoint(new PointInt32(from.X + size.Width / 2, from.Y + size.Height / 2),
+        var home = HomePosition;
+        var work = DisplayArea.GetFromPoint(new PointInt32(home.X + size.Width / 2, home.Y + size.Height / 2),
             DisplayAreaFallback.Nearest).WorkArea;
-        int gap = margin * 2 + 8;
-        int down = from.Y + size.Height + gap;
-        int up = from.Y - size.Height - gap;
-        bool downFits = down + size.Height <= work.Y + work.Height;
-        bool upFits = up >= work.Y;
-        bool preferDown = cursor.Y < from.Y + size.Height / 2;
+        int gap = margin + 8;
 
-        PointInt32 target;
-        if ((preferDown && downFits) || (!upFits && downFits))
+        var candidates = new List<PointInt32>();
+        foreach (int dx in new[] { -1, 0, 1 })
         {
-            target = new PointInt32(from.X, down);
+            foreach (int dy in new[] { -1, 0, 1 })
+            {
+                if (dx == 0 && dy == 0)
+                {
+                    continue;
+                }
+                int x = dx < 0 ? cursor.X - margin - gap - size.Width : dx > 0 ? cursor.X + margin + gap : home.X;
+                int y = dy < 0 ? cursor.Y - margin - gap - size.Height : dy > 0 ? cursor.Y + margin + gap : home.Y;
+                candidates.Add(ClampToWorkArea(new PointInt32(x, y), size, work));
+            }
         }
-        else if (upFits)
+        candidates.Add(ClampToWorkArea(new PointInt32(work.X, work.Y), size, work));
+        candidates.Add(ClampToWorkArea(new PointInt32(work.X + work.Width, work.Y), size, work));
+        candidates.Add(ClampToWorkArea(new PointInt32(work.X, work.Y + work.Height), size, work));
+        candidates.Add(ClampToWorkArea(new PointInt32(work.X + work.Width, work.Y + work.Height), size, work));
+
+        PointInt32? best = null;
+        long bestDistance = long.MaxValue;
+        foreach (var candidate in candidates)
         {
-            target = new PointInt32(from.X, up);
+            if (IsNear(cursor, candidate, size, margin))
+            {
+                continue;
+            }
+            long ddx = candidate.X - home.X, ddy = candidate.Y - home.Y;
+            long distance = ddx * ddx + ddy * ddy;
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                best = candidate;
+            }
         }
-        else
+        if (best is not PointInt32 target)
         {
-            int left = from.X - size.Width - gap;
-            int right = from.X + size.Width + gap;
-            int x = left >= work.X ? left : Math.Min(right, work.X + work.Width - size.Width);
-            target = new PointInt32(x, from.Y);
+            return;
         }
 
         _dodgeHome ??= AppWindow.Position;
         _dodgeTarget = target;
     }
+
+    private static PointInt32 ClampToWorkArea(PointInt32 point, SizeInt32 size, RectInt32 work) => new(
+        Math.Clamp(point.X, work.X, Math.Max(work.X, work.X + work.Width - size.Width)),
+        Math.Clamp(point.Y, work.Y, Math.Max(work.Y, work.Y + work.Height - size.Height)));
 
     private void AnimateTowardTarget()
     {
@@ -170,6 +197,10 @@ public sealed partial class MainWindow
         {
             AppWindow.Move(target);
             _dodgeTarget = null;
+            if (_dodgeHome is PointInt32 home && home.Equals(target))
+            {
+                _dodgeHome = null;
+            }
             return;
         }
         AppWindow.Move(new PointInt32(current.X + (int)Math.Round(dx * DodgeStep), current.Y + (int)Math.Round(dy * DodgeStep)));

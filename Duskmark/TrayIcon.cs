@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
-using static Prism.NativeMethods;
+using static Duskmark.NativeMethods;
 
-namespace Prism;
+namespace Duskmark;
 
 /// <summary>A menu entry for the tray menu. A <c>null</c> entry renders as a separator.</summary>
 internal sealed record TrayMenuItem(string Text, bool Checked, Action OnClick);

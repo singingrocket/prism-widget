@@ -1,13 +1,13 @@
 using System.Text.Json;
 
-namespace Prism.Notifications;
+namespace Duskmark.Notifications;
 
 /// <summary>
 /// A starred notification or a manually added item. Kept after the notification itself is gone.
 /// </summary>
 internal sealed record FollowUp(string Key, string AppName, string Title, string Body, DateTimeOffset Time, DateTimeOffset MarkedAt);
 
-/// <summary>Saves follow-ups in %LOCALAPPDATA%\Prism\followups.json.</summary>
+/// <summary>Saves follow-ups in %LOCALAPPDATA%\Duskmark\followups.json.</summary>
 internal sealed class FollowUpStore
 {
     private static readonly string FilePath = Path.Combine(WidgetSettings.DataFolder, "followups.json");

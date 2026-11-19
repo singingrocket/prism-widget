@@ -7,10 +7,10 @@ using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Prism.Notifications;
+using Duskmark.Notifications;
 using Windows.System;
 
-namespace Prism;
+namespace Duskmark;
 
 public sealed partial class MainWindow
 {
